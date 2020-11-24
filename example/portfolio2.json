@@ -1,0 +1,17 @@
+{
+    "USDT": {
+        "wallets": [ { "total": 1 } ]
+    },
+    "USDC": {
+        "wallets": [ { "total": 1 } ]
+    },
+    "TUSD": {
+        "wallets": [ { "total": 1 } ]
+    },
+    "BUSD": {
+        "wallets": [ { "total": 1 } ]
+    },
+    "GUSD": {
+        "wallets": [ { "total": 1 } ]
+    }
+}

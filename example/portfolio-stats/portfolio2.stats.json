@@ -1,0 +1,37 @@
+{
+    "balance": 4.9871300000000005,
+    "tickers": [
+        "BUSD$0.998!",
+        "GUSD$0.989",
+        "TUSD$1",
+        "USDC$1",
+        "USDT$1"
+    ],
+    "summary": [
+        {
+            "coin": "BUSD",
+            "balance": 0.998,
+            "price": 0.998
+        },
+        {
+            "coin": "GUSD",
+            "balance": 0.989,
+            "price": 0.989
+        },
+        {
+            "coin": "TUSD",
+            "balance": 1,
+            "price": 1
+        },
+        {
+            "coin": "USDC",
+            "balance": 1,
+            "price": 1
+        },
+        {
+            "coin": "USDT",
+            "balance": 1,
+            "price": 1
+        }
+    ]
+}

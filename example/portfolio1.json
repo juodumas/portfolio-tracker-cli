@@ -1,0 +1,11 @@
+{
+    "BTC": {
+        "wallets": [ { "total": 1 } ]
+    },
+    "ETH": {
+        "wallets": [ { "total": 10 } ]
+    },
+    "DOGE": {
+        "wallets": [ { "total": 1000 } ]
+    }
+}

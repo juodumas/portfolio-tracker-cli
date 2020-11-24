@@ -1,0 +1,9 @@
+{
+    "BTC": {"to": ["USD"]},
+    "ETH": {"to": ["USD"]},
+    "USDT": {"to": ["USD"]},
+    "USDC": {"to": ["USD"]},
+    "TUSD": {"to": ["USD"]},
+    "BUSD": {"to": ["USD"]},
+    "GUSD": {"to": ["USD"]}
+}

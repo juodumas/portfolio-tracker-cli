@@ -1,0 +1,26 @@
+{
+  "name": "portfolio-tracker-cli",
+  "version": "1.0.0",
+  "description": "CLI utility to track your cryptocurrency portfolio in realtime using CryptoCompare streamer API. Saves ticker prices & balances to text files.",
+  "license": "MIT",
+  "repository": "juodumas/portfolio-tracker-cli",
+  "keywords": [
+    "balance",
+    "crypto",
+    "cryptocompare",
+    "cryptocurrency",
+    "portfolio",
+    "tracker",
+    "websocket"
+  ],
+  "bin": {
+    "portfolio-tracker-cli": "cli.js"
+  },
+  "dependencies": {
+    "argparse": "^2.0.1",
+    "columnify": "^1.5.4",
+    "debug": "^4.3.1",
+    "persistent-json-cache": "^1.0.0",
+    "ws": "^7.4.0"
+  }
+}

@@ -1,0 +1,4 @@
+COIN COIN_BALANCE CURRENCY PRICE BALANCE
+BTC  1            USD      19404   19404
+DOGE 1000         USD      0.004    4.07
+ETH  10           USD        612    6124

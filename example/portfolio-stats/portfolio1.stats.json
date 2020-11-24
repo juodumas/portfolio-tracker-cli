@@ -1,0 +1,32 @@
+{
+    "currency": "USD",
+    "balance": 25532.1345439,
+    "tickers": [
+        "BTC$19404",
+        "DOGE$0.004",
+        "ETH$612"
+    ],
+    "summary": [
+        {
+            "coin": "BTC",
+            "coin_balance": 1,
+            "currency": "USD",
+            "price": 19404,
+            "balance": 19404
+        },
+        {
+            "coin": "DOGE",
+            "coin_balance": 1000,
+            "currency": "USD",
+            "price": 0.004,
+            "balance": 4.07
+        },
+        {
+            "coin": "ETH",
+            "coin_balance": 10,
+            "currency": "USD",
+            "price": 612,
+            "balance": 6124
+        }
+    ]
+}
