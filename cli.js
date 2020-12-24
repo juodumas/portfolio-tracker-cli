@@ -11,7 +11,8 @@ const path = require('path')
 const persistent = require('persistent-json-cache')
 const { ArgumentParser } = require('argparse')
 
-let tickerFormat = '{from}${price}{outdated}'
+let tickerFormat = '{from}{to}{price}{outdated}'
+let maxTickerAge = 3600
 let outdatedSymbol = '!'
 let saveFormats = new Set(['statsjson'])
 let targetCurrency = 'USD'
@@ -28,6 +29,32 @@ function round(price) {
     return Math.round(price * 1000) / 1000
 }
 
+function tickerFormatter(original, key) {
+    const ticker = this.ticker
+    const now = this.now
+    const useUSD = this.useUSD
+    let price = round(ticker.price)
+    let toSymbol = ticker.to
+    if (toSymbol == 'USD') {
+        toSymbol = '$'
+    }
+    else if (useUSD) {
+        toSymbol = '$'
+        price = round(ticker.priceUSD)
+    }
+    else if (toSymbol == 'BTC') {
+        toSymbol = 'µBTC'
+        price = round(ticker.price * 1e6)
+    }
+    switch (key) {
+        case 'from': return ticker.from
+        case 'to': return toSymbol
+        case 'price': return price
+        case 'outdated': return (now - ticker.timestamp) > maxTickerAge ? outdatedSymbol : ''
+    }
+    return original
+}
+
 async function loadPortfolios(portfolios) {
     debug("(re)loading portfolios")
     for (let i = 0; i < portfolios.length; i++) {
@@ -35,27 +62,31 @@ async function loadPortfolios(portfolios) {
         const raw = await fsp.readFile(portfolio.src)
         portfolio.data = JSON.parse(raw)
     }
+    // TODO subscribe to new coins, unsub from old
 }
 
-async function saveStats(portfolio, coins) {
-    const tickers = []
+async function saveStats(tickers, portfolio, coins) {
+    const now = new Date().valueOf() / 1000
+    const tickersLines = []
     const summary = []
     let totalBalance = 0
+
+    Object.keys(tickers).sort().forEach(id => {
+        const ticker = tickers[id]
+        const bound = {ticker, now}
+        tickersLines.push(tickerFormat.replace(/\{(from|to|price|outdated)\}/g, tickerFormatter.bind(bound)))
+        if (ticker.priceUSD) {
+            const bound = {ticker, now, useUSD: true}
+            tickersLines.push(tickerFormat.replace(/\{(from|to|price|outdated)\}/g, tickerFormatter.bind(bound)))
+        }
+    })
+
     Object.keys(coins).sort().forEach(from => {
         const coin = coins[from]
         if (!coin.total && from != 'BTC') {
             return
         }
         totalBalance += coin.total
-        tickers.push(tickerFormat.replace(/\{(from|to|price|outdated)\}/g, function(original, key) {
-            switch (key) {
-                case 'from': return from
-                case 'to': return coin.to
-                case 'price': return round(coin.price)
-                case 'outdated': return coin.outdated ? outdatedSymbol : ''
-            }
-            return original
-        }))
         summary.push({
             coin: from,
             coin_balance: round(coin.totalOriginal),
@@ -65,13 +96,13 @@ async function saveStats(portfolio, coins) {
         })
     })
 
-    summary.sort((a, b) => b.total - a.total)
+    summary.sort((a, b) => b.balance - a.balance)
 
     if (saveFormats.has('balancetxt')) {
         await fsp.writeFile(portfolio.totalPath, '' + round(totalBalance))
     }
     if (saveFormats.has('tickerstxt')) {
-        await fsp.writeFile(portfolio.tickersPath, tickers.join("\n"))
+        await fsp.writeFile(portfolio.tickersPath, tickersLines.join("\n"))
     }
     if (saveFormats.has('summarytxt')) {
         await fsp.writeFile(portfolio.summaryPath, columnify(summary, {
@@ -85,13 +116,14 @@ async function saveStats(portfolio, coins) {
         await fsp.writeFile(portfolio.allStatsPath, JSON.stringify({
             currency: targetCurrency,
             balance: totalBalance,
-            tickers: tickers,
+            tickers: tickersLines,
             summary: summary
         }, null, 4))
     }
 }
 
 function getPortfolioStats(tickers, portfolio) {
+    const now = new Date().valueOf() / 1000
     const coins = {}
     const missingCoinTickers = []
 
@@ -132,7 +164,7 @@ function getPortfolioStats(tickers, portfolio) {
             price: priceUSD,
             total: totalUSD,
             totalOriginal: totalCoin,
-            outdated: (new Date().valueOf() / 1000 - ticker.timestamp) > 3600
+            outdated: (now - ticker.timestamp) > maxTickerAge
         }
     }
 
@@ -147,7 +179,7 @@ function getPortfolioStats(tickers, portfolio) {
 async function savePortfoliosStats(tickers, portfolios) {
     portfolios.forEach(async portfolio => {
         const coins = getPortfolioStats(tickers, portfolio)
-        await saveStats(portfolio, coins)
+        await saveStats(tickers, portfolio, coins)
     })
 }
 
